@@ -1,7 +1,11 @@
+import telegram
+print("python-telegram-bot version:", telegram.__version__)
+
 from flask import Flask
 from threading import Thread
 import os
 from dotenv import load_dotenv
+# ... Rest deines Codes
 
 load_dotenv()  # Lädt die Variablen aus .env
 
