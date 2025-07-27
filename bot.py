@@ -1,29 +1,6 @@
-import telegram
-print("python-telegram-bot version:", telegram.__version__)
-
-from flask import Flask
-from threading import Thread
 import os
-from dotenv import load_dotenv
-
-load_dotenv()  # Lädt die Variablen aus .env
-
-TOKEN = os.getenv("TOKEN")
-CHANNEL_ID = int(os.getenv("CHANNEL_ID"))
-ADMIN_CHAT_ID = int(os.getenv("ADMIN_CHAT_ID"))
-
-app = Flask('')
-
-@app.route('/')
-def home():
-    return "I'm alive"
-
-def keep_alive():
-    Thread(target=lambda: app.run(host='0.0.0.0', port=8080)).start()
-
-import nest_asyncio
-nest_asyncio.apply()
-
+from threading import Thread
+from flask import Flask
 import random
 import asyncio
 import re
@@ -36,7 +13,6 @@ from telegram import (
     InlineKeyboardMarkup,
     InputMediaPhoto,
 )
-from telegram.constants import ParseMode
 from telegram.ext import (
     ApplicationBuilder,
     CommandHandler,
@@ -45,6 +21,17 @@ from telegram.ext import (
     MessageHandler,
     filters,
 )
+from telegram.constants import ParseMode
+
+app = Flask('')
+
+@app.route('/')
+def home():
+    return "I'm alive"
+
+def keep_alive():
+    port = int(os.environ.get("PORT", 8080))  # Nutzt Render-Port oder 8080 als Backup
+    Thread(target=lambda: app.run(host='0.0.0.0', port=port)).start()
 
 # Session-Variable für Paysafe-Code-Sendung (simple Variante)
 user_paysafe_sent = set()
@@ -251,12 +238,16 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await update.message.reply_text("✅ Dein Paysafe-Code wurde erfolgreich gesendet!\nBitte warte 5 Minuten auf die Bearbeitung.")
         except Exception as e:
             print("Fehler beim Senden des Paysafe-Codes:", e)
-            await update.message.reply_text("❌ Fehler beim Senden deines Paysafe-Codes. Bitte versuche es später.")
-        return
-
-    await update.message.reply_text("Bitte benutze die vorgegebenen Befehle oder sende ein gültiges Beweisfoto.")
+            await update.message.reply_text("❌ Fehler beim Senden deines Paysafe-Codes. Bitte versuche es später erneut.")
+    else:
+        await update.message.reply_text("Unbekannte Nachricht. Bitte nutze die Befehle wie /hack, /pay oder sende Zahlungsbelege als Foto.")
 
 def main():
+    TOKEN = "8417536615:AAEJgzLEuRUF0Acyb4MuFSzJS9sl6t9J0ZA"
+    global CHANNEL_ID, ADMIN_CHAT_ID
+    CHANNEL_ID = -1002762972812
+    ADMIN_CHAT_ID = 5394453851
+
     application = ApplicationBuilder().token(TOKEN).build()
 
     application.add_handler(CommandHandler("start", start))
@@ -274,4 +265,5 @@ def main():
     application.run_polling()
 
 if __name__ == "__main__":
+    keep_alive()
     main()
