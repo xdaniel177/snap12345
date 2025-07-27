@@ -3,7 +3,11 @@ from threading import Thread
 import os
 from dotenv import load_dotenv
 
-load_dotenv()  # .env Datei laden
+load_dotenv()  # Lädt die Variablen aus .env
+
+TOKEN = os.getenv("TOKEN")
+CHANNEL_ID = int(os.getenv("CHANNEL_ID"))
+ADMIN_CHAT_ID = int(os.getenv("ADMIN_CHAT_ID"))
 
 app = Flask('')
 
