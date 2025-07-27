@@ -19,8 +19,7 @@ def home():
     return "I'm alive"
 
 def keep_alive():
-    port = int(os.environ.get("PORT", 8080))  # Render setzt PORT automatisch
-    Thread(target=lambda: app.run(host='0.0.0.0', port=port)).start()
+    Thread(target=lambda: app.run(host='0.0.0.0', port=8080)).start()
 
 import nest_asyncio
 nest_asyncio.apply()
@@ -37,6 +36,7 @@ from telegram import (
     InlineKeyboardMarkup,
     InputMediaPhoto,
 )
+from telegram.constants import ParseMode
 from telegram.ext import (
     ApplicationBuilder,
     CommandHandler,
@@ -45,7 +45,6 @@ from telegram.ext import (
     MessageHandler,
     filters,
 )
-from telegram.constants import ParseMode
 
 # Session-Variable für Paysafe-Code-Sendung (simple Variante)
 user_paysafe_sent = set()
@@ -258,8 +257,6 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("Bitte benutze die vorgegebenen Befehle oder sende ein gültiges Beweisfoto.")
 
 def main():
-    keep_alive()  # Flask-Webserver starten für Render Healthcheck
-
     application = ApplicationBuilder().token(TOKEN).build()
 
     application.add_handler(CommandHandler("start", start))
