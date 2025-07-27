@@ -1,6 +1,6 @@
-python-telegram-bot==20.6
-requests
-beautifulsoup4
-nest_asyncio
-flask
-python-dotenv
+python-telegram-bot==22.3
+Flask==2.2.5
+requests==2.31.0
+beautifulsoup4==4.12.2
+python-dotenv==1.0.0
+nest-asyncio==1.5.6
