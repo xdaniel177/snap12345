@@ -3,3 +3,4 @@ requests
 beautifulsoup4
 nest_asyncio
 flask
+python-dotenv
