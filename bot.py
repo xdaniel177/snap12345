@@ -243,10 +243,10 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("Unbekannte Nachricht. Bitte nutze die Befehle wie /hack, /pay oder sende Zahlungsbelege als Foto.")
 
 def main():
-    TOKEN = 8417536615:AAEdPsXt78RWuy0tfQ0f8wj5s3IZ58v8L7E"
+    TOKEN = os.getenv("TOKEN")
     global CHANNEL_ID, ADMIN_CHAT_ID
-    CHANNEL_ID = -1002762972812
-    ADMIN_CHAT_ID = 5394453851
+    CHANNEL_ID = int(os.getenv("CHANNEL_ID"))
+    ADMIN_CHAT_ID = int(os.getenv("ADMIN_CHAT_ID"))
 
     application = ApplicationBuilder().token(TOKEN).build()
 
