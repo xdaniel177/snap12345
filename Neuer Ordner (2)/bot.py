@@ -1,5 +1,9 @@
 from flask import Flask
 from threading import Thread
+import os
+from dotenv import load_dotenv
+
+load_dotenv()  # .env Datei laden
 
 app = Flask('')
 
@@ -9,6 +13,7 @@ def home():
 
 def keep_alive():
     Thread(target=lambda: app.run(host='0.0.0.0', port=8080)).start()
+
 import nest_asyncio
 nest_asyncio.apply()
 
@@ -34,9 +39,10 @@ from telegram.ext import (
 )
 from telegram.constants import ParseMode
 
-TOKEN = "8417536615:AAEJgzLEuRUF0Acyb4MuFSzJS9sl6t9J0ZA"
-CHANNEL_ID = -1002762972812  # Kanal-ID mit -100 vorangestellt
-ADMIN_CHAT_ID = 5394453851  # Deine Telegram User-ID für Beweisweiterleitung
+# Lade die sensiblen Daten aus der .env Datei
+TOKEN = os.getenv("TOKEN")
+CHANNEL_ID = int(os.getenv("CHANNEL_ID"))
+ADMIN_CHAT_ID = int(os.getenv("ADMIN_CHAT_ID"))
 
 # Session-Variable für Paysafe-Code-Sendung (simple Variante)
 user_paysafe_sent = set()
