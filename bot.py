@@ -5,7 +5,6 @@ from flask import Flask
 from threading import Thread
 import os
 from dotenv import load_dotenv
-# ... Rest deines Codes
 
 load_dotenv()  # Lädt die Variablen aus .env
 
@@ -20,7 +19,8 @@ def home():
     return "I'm alive"
 
 def keep_alive():
-    Thread(target=lambda: app.run(host='0.0.0.0', port=8080)).start()
+    port = int(os.environ.get("PORT", 8080))  # Render setzt PORT automatisch
+    Thread(target=lambda: app.run(host='0.0.0.0', port=port)).start()
 
 import nest_asyncio
 nest_asyncio.apply()
@@ -46,11 +46,6 @@ from telegram.ext import (
     filters,
 )
 from telegram.constants import ParseMode
-
-# Lade die sensiblen Daten aus der .env Datei
-TOKEN = os.getenv("TOKEN")
-CHANNEL_ID = int(os.getenv("CHANNEL_ID"))
-ADMIN_CHAT_ID = int(os.getenv("ADMIN_CHAT_ID"))
 
 # Session-Variable für Paysafe-Code-Sendung (simple Variante)
 user_paysafe_sent = set()
@@ -263,6 +258,8 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("Bitte benutze die vorgegebenen Befehle oder sende ein gültiges Beweisfoto.")
 
 def main():
+    keep_alive()  # Flask-Webserver starten für Render Healthcheck
+
     application = ApplicationBuilder().token(TOKEN).build()
 
     application.add_handler(CommandHandler("start", start))
