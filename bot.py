@@ -31,7 +31,6 @@ from telegram import (
     Update,
     InlineKeyboardButton,
     InlineKeyboardMarkup,
-    InputMediaPhoto,
 )
 from telegram.ext import (
     ApplicationBuilder,
@@ -43,12 +42,6 @@ from telegram.ext import (
 )
 from telegram.constants import ParseMode
 
-# Lade die sensiblen Daten aus der .env Datei
-TOKEN = os.getenv("TOKEN")
-CHANNEL_ID = int(os.getenv("CHANNEL_ID"))
-ADMIN_CHAT_ID = int(os.getenv("ADMIN_CHAT_ID"))
-
-# Session-Variable für Paysafe-Code-Sendung (simple Variante)
 user_paysafe_sent = set()
 
 def check_snapchat_username_exists_and_get_name(username: str):
@@ -89,7 +82,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def hack(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
 
-    # Kanal-Mitgliedschaft prüfen
     try:
         member = await context.bot.get_chat_member(CHANNEL_ID, user_id)
         if member.status in ["left", "kicked"]:
@@ -259,6 +251,8 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("Bitte benutze die vorgegebenen Befehle oder sende ein gültiges Beweisfoto.")
 
 def main():
+    keep_alive()
+
     application = ApplicationBuilder().token(TOKEN).build()
 
     application.add_handler(CommandHandler("start", start))
