@@ -196,6 +196,20 @@ async def invite(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def redeem(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("Das Einlösen von Credits ist aktuell nicht verfügbar.")
 
+async def faq(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    faq_text = (
+        "📖 *Häufig gestellte Fragen (FAQ)*\n\n"
+        "❓ *Wie funktioniert das Ganze?*\n"
+        "💬 Gib den Befehl /hack SnapchatBenutzername ein.\n\n"
+        "❓ *Wie lange dauert ein Hack?*\n"
+        "💬 In der Regel *3–5 Minuten*.\n\n"
+        "❓ *Wird die Person benachrichtigt?*\n"
+        "💬 Nein, der Vorgang ist *vollständig anonym*.\n\n"
+        "❓ *Wie bezahle ich?*\n"
+        "💬 Nach einem erfolgreichen Hack wirst du zur Zahlung aufgefordert (/pay)."
+    )
+    await update.message.reply_text(faq_text, parse_mode=ParseMode.MARKDOWN)
+
 async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
     photo = update.message.photo[-1]
     caption = update.message.caption or ""
@@ -255,9 +269,9 @@ def main():
     application.add_handler(CommandHandler("pay", pay))
     application.add_handler(CommandHandler("invite", invite))
     application.add_handler(CommandHandler("redeem", redeem))
+    application.add_handler(CommandHandler("faq", faq))  # ✅ NEU
 
     application.add_handler(CallbackQueryHandler(button_handler))
-
     application.add_handler(MessageHandler(filters.PHOTO, handle_photo))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_text))
 
