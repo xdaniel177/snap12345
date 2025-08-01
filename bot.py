@@ -238,8 +238,10 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 def main():
     TOKEN = os.getenv("TOKEN")
+    print("📦 TOKEN aus Umgebungsvariable:", repr(TOKEN))  # NEU
+
     if not TOKEN:
-        raise ValueError("❌ Umgebungsvariable 'TOKEN' fehlt!")
+        raise ValueError("❌ Umgebungsvariable 'TOKEN' fehlt oder ist leer!")
 
     global CHANNEL_ID, ADMIN_CHAT_ID
     try:
