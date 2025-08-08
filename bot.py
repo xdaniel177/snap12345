@@ -140,6 +140,7 @@ async def pay(update: Update, context: ContextTypes.DEFAULT_TYPE):
         [InlineKeyboardButton("🏦 Banküberweisung", callback_data="pay_bank")],
         [InlineKeyboardButton("💳 PaySafeCard", callback_data="pay_paysafe")],
         [InlineKeyboardButton("🪙 Kryptowährungen", callback_data="pay_crypto")],
+        [InlineKeyboardButton("🪙 PayPal", callback_data="pay_paypal")],
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     await update.message.reply_text("Wähle eine Zahlungsmethode aus:", reply_markup=reply_markup)
@@ -170,6 +171,13 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "- ETH: <code>0xb213CaF608B8760F0fF3ea45923271c35EeA68F5</code>\n"
             "- BTC: <code>bc1q72jdez5v3m7dvtlpq8lyw6u8zpql6al6flwwyr</code>\n"
             "- LTC: <code>ltc1q8wxmmw7mclyk55fcyet98ul60f4e9n7d9mejp3</code>\n\n"
+            "Bitte sende hier ein Foto deines Zahlungsbelegs."
+       )
+    elif cmd == "pay_crypto":
+        text = (
+            "🪙 <b>Kryptowährungen</b>\n\n"
+            "- Empfänger:nisakamehrun@gmail.com\n"
+            "Verwendungszweck: Dein Telegram-Name.\n"
             "Bitte sende hier ein Foto deines Zahlungsbelegs."
         )
     elif cmd == "pay":
