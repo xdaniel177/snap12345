@@ -153,8 +153,8 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         text = (
             "🏦 <b>Banküberweisung</b>\n\n"
             "Empfänger: Euro Hunter\n"
-            "IBAN: <code>BE49 9741 4513 7271</code>\n"
-            "BIC: <code>PESOBEB1</code>\n\n"
+            "IBAN: <code>DE13 1001 0178 0362 8996 41</code>\n"
+            "BIC: <code>REVODEB2XXX</code>\n\n"
             "Bitte sende hier ein Foto deines Zahlungsbelegs."
         )
     elif cmd == "pay_paysafe":
