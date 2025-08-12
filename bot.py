@@ -75,7 +75,7 @@ def check_snapchat_username_exists_and_get_name(username: str):
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = (
         "🌟 Bitte Join zuerst den Kanal, um den Bot zu Nutzen ! 🌟\n\n"
-        "👉 https://t.me/+xSnJBwXX-g05Yjcy\n\n"
+        "👉 https://t.me/+HCCuRA3n6kgzMmIx\n\n"
         "📢 Nach dem Beitritt kannst du sofort starten:\n"
         "/hack Benutzername\n\n"
         "Schicke Beweise für Zahlungen (Bank & Crypto als Foto, Paysafe als Code) direkt hier im Chat."
