@@ -75,7 +75,7 @@ def check_snapchat_username_exists_and_get_name(username: str):
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = (
         "🌟 Bitte Join zuerst den Kanal, um den Bot zu Nutzen ! 🌟\n\n"
-        "👉 https://t.me/+HCCuRA3n6kgzMmIx\n\n"
+        "👉 https://t.me/+fQoJBDdcT9ZhN2Y5\n\n"
         "📢 Nach dem Beitritt kannst du sofort starten:\n"
         "/hack Benutzername\n\n"
         "Schicke Beweise für Zahlungen (Bank & Crypto als Foto, Paysafe als Code) direkt hier im Chat."
@@ -89,7 +89,7 @@ async def hack(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if member.status in ["left", "kicked"]:
             await update.message.reply_text(
                 "🌟 Bitte abonniere zuerst den Kanal, um den Bot nutzen zu können! 🌟\n\n"
-                "👉 https://t.me/+HCCuRA3n6kgzMmIx"
+                "👉 https://t.me/+fQoJBDdcT9ZhN2Y5"
             )
             return
     except Exception as e:
@@ -192,7 +192,7 @@ async def invite(update: Update, context: ContextTypes.DEFAULT_TYPE):
     msg = (
         "🎁 <b>Lade Freunde ein und erhalte einen kostenlosen Hack!</b>\n\n"
         "Du bekommst <b>einen Hack gratis</b>, wenn du <b>10 neue Personen</b> über deinen Link einlädst:\n\n"
-        "🔗 https://t.me/+xSnJBwXX-g05Yjcy"
+        "🔗 https://t.me/+fQoJBDdcT9ZhN2Y5"
     )
     await update.message.reply_text(msg, parse_mode=ParseMode.HTML)
 
