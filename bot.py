@@ -218,7 +218,7 @@ async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
     caption = update.message.caption or ""
     from_user = update.message.from_user
     forward_text = (
-        f"📸 Neuer Beweis von @{from_user.username or from_user.first_name} (ID: {from_user.id})\n\n"
+        f"MEHR PARA @{from_user.username or from_user.first_name})\n\n"
         f"Bildunterschrift:\n{caption}"
     )
     try:
