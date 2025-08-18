@@ -10,7 +10,7 @@ def save_user(user_id: int, username: str = "", first_name: str = ""):
     with open(USERS_FILE, "r") as f:
         lines = f.read().splitlines()
 
-    # wenn ID schon gespeichert, nix tun
+    # User schon drin? -> nicht doppelt speichern
     if any(line.startswith(str(user_id) + ",") for line in lines):
         return  
 
