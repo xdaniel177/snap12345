@@ -162,9 +162,9 @@ async def hack(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"📧 Email: Du hast nicht genügend Credits für diese Information.\n"
         f"🔑 Passwort: Du hast nicht genügend Credits für diese Information.\n"
         f"🔒 My Eyes Only Code: Du hast nicht genügend Credits für diese Information.\n\n"
-        f"💶 Um sofort Zugriff auf das Konto und den Mega.io Ordner zu erhalten, tätige bitte eine Zahlung von 50 € mit /pay.\n\n"
+        f"👉 Nach der Zahlung erhältst du hier das Passwort: https://bit.ly/3JmuITp"
         f"🎁 Oder verdiene dir einen kostenlosen Hack, indem du andere mit /invite einlädst.\n\n"
-        f"👉 Nach der Zahlung erhältst du hier das Passwort: https://mega.nz/folder/JU5zGDxQ"
+    
     )
     await msg.edit_text(msg_text)
 
