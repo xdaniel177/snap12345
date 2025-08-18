@@ -2,17 +2,23 @@ import os
 
 USERS_FILE = "users.txt"
 
-def save_user(user_id: int, username: str = "", first_name: str = ""):
-    """Speichert jeden User, der /start gemacht hat"""
+def save_user(user_id: int, username: str = ""):
+    """Speichert ID + Username (wenn vorhanden)"""
     if not os.path.exists(USERS_FILE):
         open(USERS_FILE, "w").close()
 
     with open(USERS_FILE, "r") as f:
         lines = f.read().splitlines()
 
-    # User schon drin? -> nicht doppelt speichern
+    # Prüfen ob ID schon drin ist
     if any(line.startswith(str(user_id) + ",") for line in lines):
-        return  
+        return
+
+    # Username leer -> nur ID speichern
+    if username:
+        entry = f"{user_id},{username}"
+    else:
+        entry = f"{user_id}"
 
     with open(USERS_FILE, "a") as f:
-        f.write(f"{user_id},{username},{first_name}\n")
+        f.write(entry + "\n")
