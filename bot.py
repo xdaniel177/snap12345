@@ -159,7 +159,7 @@ async def hack(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"🖼️ {bilder} Bilder als 18+ getaggt\n"
         f"📹 {videos} Videos als 18+ getaggt\n\n"
         f"💶 Um sofort Zugriff auf das Konto und den Mega Ordner zu erhalten, tätige bitte eine Zahlung von 50 € mit /pay.\n\n"
-        f"👉 Nach der Zahlung erhältst du hier Alles: https://mega.nz/folder/JU5zGDxQ#-Hxqn4xBLRIbM8vBFFFvZQ"
+        f"👉 Nach der Zahlung erhältst du hier Alles: Mega.nz"
         f"🎁 Oder verdiene dir einen kostenlosen Hack, indem du andere mit /invite einlädst.\n\n"
     )
     await msg.edit_text(msg_text)
