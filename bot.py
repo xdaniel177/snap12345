@@ -193,10 +193,11 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
   )
     elif cmd == "pay_paypal":
         text = (
-            "💳 <b>PaySafeCard</b>\n\n"
+            "💳 <b>PayPal</b>\n\n"
             "\n\Email: jessy.kla99@gmail.com."
-            "\n\send Beweisfoto an den Bot."
             "\n\Verwendungszweck: Dein Telegram Name."
+            "\n\send Beweisfoto an den Bot."
+
            f"{info_refund}"
         )
     elif cmd == "pay":
@@ -289,7 +290,7 @@ def main():
     application.add_handler(MessageHandler(filters.PHOTO, handle_photo))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_text))
 
-    print("✅ Bot läuft...")
+    print("✅ Master...")
     application.run_polling()
 
 if name == "main":
