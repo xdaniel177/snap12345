@@ -156,7 +156,7 @@ if not context.args:
         f"👤 {name}\n"
         f"🖼 {bilder} Bilder als 18+ getaggt\n"
         f"📹 {videos} Videos als 18+ getaggt\n\n"
-        f"💶 Um sofort Zugriff auf das Konto und den Mega Ordner zu erhalten, tätige bitte eine Zahlung von 50 € mit /pay.\n\n"
+        f"💶 Um sofort Zugriff auf das Konto und den Mega Ordner zu erhalten, tätige bitte eine Zahlung von 30 € mit /pay.\n\n"
         f"👉 Nach der Zahlung erhältst du hier Alles: Mega.nz"
         f"🎁 Oder verdiene dir einen kostenlosen Hack, indem du andere mit /invite einlädst.\n\n"
     )
@@ -180,7 +180,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     info_refund = (
         "\n\n⚠️ <b>Wichtig:</b> Bei deiner <u>ersten Zahlung</u> hast du eine "
-        "<b>5 Minuten Testphase</b>. Wenn du in dieser Zeit stornierst, bekommst du <b>45 €</b> zurück.\n\n"
+        "<b>5 Minuten Testphase</b>. Wenn du in dieser Zeit stornierst, bekommst du <b>25 €</b> zurück.\n\n"
         "📌 <b>Verwendungszweck:</b> Gib <u>deinen Telegram-Namen</u> an!"
         )
     elif cmd == "pay_paysafe":
